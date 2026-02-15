@@ -1830,6 +1830,7 @@ impl State {
                 for token in tokens {
                     self.common.event_loop_handle.remove(token);
                 }
+                self.common.global_shortcuts_state.deactivate_all();
                 return FilterResult::Intercept(None);
             }
         }
@@ -1906,6 +1907,20 @@ impl State {
                         binding.clone(),
                     )));
                 }
+            }
+        }
+
+        // Check for portal global shortcuts (lower priority than compositor shortcuts)
+        if event.state() == KeyState::Pressed && !shortcuts_inhibited {
+            if let Some(shortcut_id) = self
+                .common
+                .global_shortcuts_state
+                .find_shortcut(modifiers, handle.modified_sym())
+            {
+                self.common.global_shortcuts_state.activate(&shortcut_id);
+                seat.modifiers_shortcut_queue().clear();
+                seat.supressed_keys().add(&handle, None);
+                return FilterResult::Intercept(None);
             }
         }
 

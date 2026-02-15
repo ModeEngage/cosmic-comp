@@ -12,10 +12,13 @@ use tracing::{error, warn};
 use zbus::blocking::{Connection, fdo::DBusProxy};
 
 pub mod a11y_keyboard_monitor;
+pub mod global_shortcuts;
 #[cfg(feature = "systemd")]
 pub mod logind;
 mod name_owners;
 mod power;
+
+pub use global_shortcuts::GlobalShortcutsState;
 
 pub fn init(
     evlh: &LoopHandle<'static, State>,

@@ -199,4 +199,13 @@ impl NameOwners {
         self.poll_name_owners(allowed_names).await;
         self.check_owner_no_poll(name, allowed_names)
     }
+
+    /// Check if any of the well-known names are currently owned
+    pub fn any_name_present_no_poll(&self, names: &[WellKnownName<'_>]) -> bool {
+        let mut inner = self.0.lock().unwrap();
+        inner.update_if_needed();
+        names
+            .iter()
+            .any(|n| inner.name_owners.get(n).and_then(|x| x.as_ref()).is_some())
+    }
 }
